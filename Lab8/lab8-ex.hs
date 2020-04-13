@@ -4,6 +4,7 @@
 
 import Data.List
 import Data.Maybe
+import Data.Typeable
 import TestPP
 
 {-
@@ -47,8 +48,10 @@ lengthV :: Vector -> Double
 lengthV (V vx vy vz) = sqrt(vx * vx + vy * vy + vz * vz)
 
 normalizeV :: Vector -> Vector
-normalizeV (V vx vy vz) = (V (vx / length(V vx vy vz)) + (vy / length(V vx vy vz)) + (vz / length(V vx vy vz)))
-
+normalizeV (V vx vy vz) = 
+  let len = lengthV(V vx vy vz) 
+  in (V (vx / len) (vy / len) (vz / len))
+    
 dotV :: Vector -> Vector -> Double
 dotV (V vx vy vz) (V ax ay az) = (vx * ax + vy * ay + vz * az)
 
@@ -62,7 +65,11 @@ subV :: Vector -> Vector -> Vector
 subV (V vx vy vz) (V ax ay az) = (V (vx - ax) (vy - ay) (vz - az))
 
 orthogonalV :: [Vector] -> Bool
-orthogonalV = undefined
+orthogonalV list = 
+  let myL = [case (dotV x y) of
+                0 -> True
+                1 -> False | x <- list, y <- list, x /= y] 
+  in foldl (&&) True myL
 
 check1 :: TestData
 check1 = do
@@ -100,28 +107,35 @@ check1 = do
   (1p) headSList și tailSList
   (1p) flatten
 -}
-data SList a = UndefinedSList deriving Show
+data SList a = UndefinedSList | E a | L [SList a] deriving Show
 
 emptySList :: SList a
-emptySList = undefined
+emptySList = L []
 
 consElem :: a -> SList a -> SList a
-consElem = undefined
+consElem x (E y) = L [E x, E y]
+consElem x (L y) = L (E x : y)
 
 consList :: SList a -> SList a -> SList a
-consList = undefined
+consList x (E y) = L [x, E y]
+consList x (L y) = L (x : y)
 
 headSList :: SList a -> SList a
-headSList = undefined
+headSList (L y) = head y
 
 tailSList :: SList a -> SList a
-tailSList = undefined
+tailSList (L y) = L $ (reverse $ init y)
 
 deepEqual :: Eq a => SList a -> SList a -> Bool
-deepEqual = undefined
+deepEqual (E x) (E y) = 
+  if x == y then True else False
+deepEqual (L x) (L y) =
+  if length x /= length y then False 
+    else if and (zipWith deepEqual x y) then True else False
 
 flatten :: SList a -> [a]
-flatten = undefined
+flatten (E x) = [x]
+flatten (L x) = concat $ map flatten x
 
 check2 :: TestData
 check2 = do
@@ -146,13 +160,19 @@ check2 = do
   în inordine a arborelui și o funcție care întoarce cel mai mic subarbore
   care conține două noduri ale căror chei sunt date.
 -}
-data BST a = UndefinedNode | BSTNil deriving Show
+data BST a = UndefinedNode | Treenode a (BST a) (BST a) | BSTNil deriving Show
 
 insertElem :: (Ord a, Eq a) => BST a -> a -> BST a
-insertElem = undefined
+insertElem BSTNil nod = Treenode nod BSTNil BSTNil
+insertElem (Treenode curr left right) nod = 
+  if nod > curr then Treenode curr left (insertElem right nod)
+  else Treenode curr (insertElem left nod) right  
 
 findElem :: (Ord a, Eq a) => BST a -> a -> Maybe a
-findElem = undefined
+findElem (Treenode curr left right) nod =
+  if nod == curr then Just nod
+  else if nod < curr then findElem left nod
+  else findElem right nod
 
 subTree :: (Ord a, Eq a) => BST a -> a -> a -> Maybe (BST a)
 subTree = undefined
