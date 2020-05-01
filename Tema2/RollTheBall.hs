@@ -154,8 +154,9 @@ verW dir
     | otherwise = False
 
 verifChar :: [[Cell]] -> Position -> Bool 
-verifChar lvl (r,c) =
-    if emptySpace == getCh(lvl !! r !! c) then True else False
+verifChar lvl (r,c)
+    | emptySpace == getCh(lvl !! r !! c) = True 
+    | otherwise = False
 
 moveCell :: Position -> Directions -> Level -> Level
 moveCell (row, col) dir lvl
@@ -219,8 +220,8 @@ connection cell1 cell2 d =
 	else if getCh cell1 == verPipe && getCh cell2 == winDown && d == North then True
 	else if getCh cell1 == botLeft && getCh cell2 == topLeft && d == North then True
 	else if getCh cell1 == topLeft && getCh cell2 == botLeft && d == South then True
-	else if getCh cell1 == botRight && getCh cell2 == topLeft && d == North then True
-	else if getCh cell1 == topLeft && getCh cell2 == botRight && d == South then True
+	else if getCh cell1 == botRight && getCh cell2 == topLeft && d == West then True
+	else if getCh cell1 == topLeft && getCh cell2 == botRight && d == East then True
 	else if getCh cell1 == topRight && getCh cell2 == topLeft && d == West then True
 	else if getCh cell1 == topLeft && getCh cell2 == topRight && d == East then True
 	else if getCh cell1 == startUp && getCh cell2 == topLeft && d == North then True
@@ -305,40 +306,44 @@ verifNorthConnection :: Position -> [[Cell]] -> [Cell] -> Bool
 verifNorthConnection (x,y) level visited 
     | (connection ((level !! x) !! y) ((level !! (x - 1)) !! y) North) && not (elem ((level !! (x - 1)) !! y) visited) = True
     | otherwise = False
+--moveCell :: Position -> Directions -> Level -> Level
 
-checkWin :: Level -> Cell -> [Cell] -> Cell -> Bool
-checkWin level cell visited winCell
-        |(lvl !! x) !! y == winCell = True
-	    | x < 0 || y < 0 = False -- out of bounds
-	    | y - 1 >= 0 
-            && verifWestConnection (x,y) lvl visited
-		    = checkWin level ((lvl !! x) !! (y - 1)) (((lvl !! x) !! y) : visited) winCell
-	    | y + 1 < (length (lvl !! 0)) 
-            && verifEastConnection (x,y) lvl visited
-		    = checkWin level ((lvl !! x) !! (y + 1)) ((lvl !! x) !! y : visited) winCell
-	    | x + 1 < (length lvl) 
-            && verifSouthConnection (x,y) lvl visited
-		    = checkWin level (lvl !! (x + 1) !! y) ((lvl !! x) !! y : visited) winCell
-	    | x - 1 >= 0 
-            && verifNorthConnection (x,y) lvl visited
-		    = checkWin level (lvl !! (x - 1) !! y) ((lvl !! x) !! y : visited) winCell
+checkWin :: Level -> Cell -> [Cell] -> Bool
+checkWin level cell visited
+        | (list !! row) !! col == winCell = True
+	    | row < 0 || col < 0  = False -- out of bounds
+        | row - 1 >= 0 
+            && verifNorthConnection (row,col) list visited
+		    = checkWin (moveCell (getPos cell) North level) (list !! (row - 1) !! col) (list !! row !! col : visited)
+        | row + 1 < length list 
+            && verifSouthConnection (row,col) list visited
+		    = checkWin (moveCell (getPos cell) South level) (list !! (row + 1) !! col) (list !! row !! col : visited)
+        | col + 1 < length (list !! 0) 
+            && verifEastConnection (row,col) list visited
+		    = checkWin (moveCell (getPos cell) East level) (list !! row !! (col + 1)) (list !! row !! col : visited)
+	    | col - 1 >= 0 
+            && verifWestConnection (row,col) list visited
+		    = checkWin (moveCell (getPos cell) West level) (list !! row !! (col - 1)) (list !! row !! col : visited)
         | otherwise = False
             where
-                (x,y) = getPos cell
-                lvl = (getList level)
+                (row,col) = getPos cell
+                list = getList level -- [[Cell]]
+                charList =  [ys | xs <- list, ys <- xs] -- [Cell]
+                winCell = getWinCell charList -- ending point level-ului
+
+                -- (trace (de afisat)  ( aici ce voiai sa faca functia))
+
 
 wonLevel :: Level -> Bool
-wonLevel level = (checkWin level startCell [startCell] winCell)
+wonLevel level = (checkWin level startCell [])
     where 
         list = getList level -- [[Cell]]
         charList =  [y | x <- list, y <- x] -- [Cell]
         startCell = getStartCell charList -- starting point level-ului care vine
-        winCell = getWinCell charList -- ending point level-ului
-        -- recursiv sus/jos/stanga/dreapta in caz de oob 
-        -- o pozitie ai sa nu te intorci
 
  
 instance ProblemState Level (Position, Directions) where
+    -- [((Position,Directions), level)]
     successors = undefined
     isGoal = undefined
     reverseAction = undefined
