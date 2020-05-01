@@ -187,118 +187,84 @@ connection :: Cell -> Cell -> Directions -> Bool
 connection cell1 cell2 d =
 	if getCh cell1 == topLeft && getCh cell2 == horPipe && d == East then True
 	else if getCh cell1 == horPipe && getCh cell2 == topLeft && d == West then True
-
 	else if getCh cell1 == botLeft && getCh cell2 == horPipe && d == East then True
 	else if getCh cell1 == horPipe && getCh cell2 == botLeft && d == West then True
-
 	else if getCh cell1 == winRight && getCh cell2 == horPipe && d == East then True
 	else if getCh cell1 == horPipe && getCh cell2 == winRight && d == West then True
-
 	else if getCh cell1 == topRight && getCh cell2 == horPipe && d == West then True
 	else if getCh cell1 == horPipe && getCh cell2 == topRight && d == East then True
-
 	else if getCh cell1 == botRight && getCh cell2 == horPipe && d == West then True
 	else if getCh cell1 == horPipe && getCh cell2 == botRight && d == East then True
-
 	else if getCh cell1 == startLeft && getCh cell2 == horPipe && d == East then True
 	else if getCh cell1 == horPipe && getCh cell2 == startLeft && d == West then True
-	
 	else if getCh cell1 == startRight && getCh cell2 == horPipe && d == East then True
 	else if getCh cell1 == horPipe && getCh cell2 == startRight && d == West then True
-
 	else if getCh cell1 == winLeft && getCh cell2 == horPipe && d == West then True
 	else if getCh cell1 == horPipe && getCh cell2 == winLeft && d == East then True
-
 	else if getCh cell1 == topLeft && getCh cell2 == verPipe && d == South then True
 	else if getCh cell1 == verPipe && getCh cell2 == topLeft && d == North then True
-
 	else if getCh cell1 == topRight && getCh cell2 == verPipe && d == South then True
 	else if getCh cell1 == verPipe && getCh cell2 == topRight && d == North then True
-
 	else if getCh cell1 == botLeft && getCh cell2 == verPipe && d == North then True
 	else if getCh cell1 == verPipe && getCh cell2 == botLeft && d == South then True
-
 	else if getCh cell1 == botRight && getCh cell2 == verPipe && d == North then True
 	else if getCh cell1 == verPipe && getCh cell2 == botRight && d == South then True
-
 	else if getCh cell1 == startUp && getCh cell2 == verPipe && d == North then True
 	else if getCh cell1 == verPipe && getCh cell2 == startUp && d == South then True
-
 	else if getCh cell1 == startDown && getCh cell2 == verPipe && d == South then True
 	else if getCh cell1 == verPipe && getCh cell2 == startDown && d == North then True
-
 	else if getCh cell1 == winUp && getCh cell2 == verPipe && d == North then True
 	else if getCh cell1 == verPipe && getCh cell2 == winUp && d == South then True
-
 	else if getCh cell1 == winDown && getCh cell2 == verPipe && d == South then True
 	else if getCh cell1 == verPipe && getCh cell2 == winDown && d == North then True
-
 	else if getCh cell1 == botLeft && getCh cell2 == topLeft && d == North then True
 	else if getCh cell1 == topLeft && getCh cell2 == botLeft && d == South then True
-
 	else if getCh cell1 == botRight && getCh cell2 == topLeft && d == North then True
 	else if getCh cell1 == topLeft && getCh cell2 == botRight && d == South then True
-
 	else if getCh cell1 == topRight && getCh cell2 == topLeft && d == West then True
 	else if getCh cell1 == topLeft && getCh cell2 == topRight && d == East then True
-
 	else if getCh cell1 == startUp && getCh cell2 == topLeft && d == North then True
 	else if getCh cell1 == topLeft && getCh cell2 == startUp && d == South then True
-
 	else if getCh cell1 == startLeft && getCh cell2 == topLeft && d == West then True
 	else if getCh cell1 == topLeft && getCh cell2 == startLeft && d == East then True
-
 	else if getCh cell1 == winUp && getCh cell2 == topLeft && d == North then True
 	else if getCh cell1 == topLeft && getCh cell2 == winUp && d == South then True
-
 	else if getCh cell1 == winLeft && getCh cell2 == topLeft && d == West then True
 	else if getCh cell1 == topLeft && getCh cell2 == winLeft && d == East then True
-
 	else if getCh cell1 == botRight && getCh cell2 == botLeft && d == West then True
 	else if getCh cell1 == botLeft && getCh cell2 == botRight && d == East then True
-
 	else if getCh cell1 == topRight && getCh cell2 == botLeft && d == West then True
 	else if getCh cell1 == botLeft && getCh cell2 == topRight && d == East then True
-
 	else if getCh cell1 == startDown && getCh cell2 == botLeft && d == South then True
 	else if getCh cell1 == botLeft && getCh cell2 == startDown && d == North then True
-
 	else if getCh cell1 == startLeft && getCh cell2 == botLeft && d == West then True
 	else if getCh cell1 == botLeft && getCh cell2 == startLeft && d == East then True
-
 	else if getCh cell1 == winDown && getCh cell2 == botLeft && d == South then True
 	else if getCh cell1 == botLeft && getCh cell2 == winDown && d == North then True
-
 	else if getCh cell1 == winLeft && getCh cell2 == botLeft && d == West then True
 	else if getCh cell1 == botLeft && getCh cell2 == winLeft && d == East then True
-
 	else if getCh cell1 == topRight && getCh cell2 == botRight && d == South then True
 	else if getCh cell1 == botRight && getCh cell2 == topRight && d == North then True
-
 	else if getCh cell1 == startDown && getCh cell2 == botRight && d == South then True
 	else if getCh cell1 == botRight && getCh cell2 == startDown && d == North then True
-
 	else if getCh cell1 == startRight && getCh cell2 == botRight && d == East then True
 	else if getCh cell1 == botRight && getCh cell2 == startRight && d == West then True
-
 	else if getCh cell1 == winDown && getCh cell2 == botRight && d == South then True
 	else if getCh cell1 == botRight && getCh cell2 == winDown && d == North then True
-
 	else if getCh cell1 == winRight && getCh cell2 == botRight && d == East then True
 	else if getCh cell1 == botRight && getCh cell2 == winRight && d == West then True
-
 	else if getCh cell1 == startUp && getCh cell2 == topRight && d == North then True
 	else if getCh cell1 == topRight && getCh cell2 == startUp && d == South then True
-
 	else if getCh cell1 == startRight && getCh cell2 == topRight && d == East then True
 	else if getCh cell1 == topRight && getCh cell2 == startRight && d == West then True
-
 	else if getCh cell1 == winUp && getCh cell2 == topRight && d == North then True
 	else if getCh cell1 == topRight && getCh cell2 == winUp && d == South then True
-
 	else if getCh cell1 == winRight && getCh cell2 == topRight && d == East then True
 	else if getCh cell1 == topRight && getCh cell2 == winRight && d == West then True
-
+    else if getCh cell1 == horPipe && getCh cell2 == horPipe && d == West then True
+    else if getCh cell1 == horPipe && getCh cell2 == horPipe && d == East then True
+    else if getCh cell1 == verPipe && getCh cell2 == verPipe && d == North then True
+    else if getCh cell1 == verPipe && getCh cell2 == verPipe && d == South then True 
 	else False
  
 {-
@@ -311,21 +277,62 @@ connection cell1 cell2 d =
 -}
 
 getStartCell :: [Cell] -> Cell
-getStartCell list = if elem (getCh ( head list )) startCells then head list else getStartCell (tail list)  
+getStartCell list
+    | elem (getCh ( head list )) startCells = head list 
+    | otherwise = getStartCell (tail list) 
 
 getWinCell :: [Cell] -> Cell
-getWinCell list = if elem (getCh ( head list )) winningCells then head list else getWinCell (tail list)  
+getWinCell list
+    | elem (getCh ( head list )) winningCells = head list 
+    | otherwise = getWinCell (tail list)  
 
--- let a = getList level1
--- let b = [y | x <- a, y <- x]
--- getStartCell b
+verifWestConnection :: Position -> [[Cell]] -> [Cell] -> Bool
+verifWestConnection (x,y) level  visited 
+    | (connection ((level !! x) !! y) ((level !! x) !! (y - 1)) West && not (elem ((level !! x) !! (y - 1)) visited)) = True
+    | otherwise = False
+
+verifEastConnection :: Position -> [[Cell]] -> [Cell] -> Bool
+verifEastConnection (x,y) level visited
+    | (connection ((level !! x) !! y) ((level !! x) !! (y + 1)) East) && not (elem ((level !! x) !! (y + 1)) visited) = True
+    | otherwise = False
+
+verifSouthConnection :: Position -> [[Cell]] -> [Cell] -> Bool
+verifSouthConnection (x,y) level visited 
+    | (connection ((level !! x) !! y) ((level !! (x + 1)) !! y) South) && not (elem ((level !! (x + 1)) !! y) visited) = True
+    | otherwise = False
+
+verifNorthConnection :: Position -> [[Cell]] -> [Cell] -> Bool
+verifNorthConnection (x,y) level visited 
+    | (connection ((level !! x) !! y) ((level !! (x - 1)) !! y) North) && not (elem ((level !! (x - 1)) !! y) visited) = True
+    | otherwise = False
+
+checkWin :: Level -> Cell -> [Cell] -> Cell -> Bool
+checkWin level cell visited winCell
+        |(lvl !! x) !! y == winCell = True
+	    | x < 0 || y < 0 = False -- out of bounds
+	    | y - 1 >= 0 
+            && verifWestConnection (x,y) lvl visited
+		    = checkWin level ((lvl !! x) !! (y - 1)) (((lvl !! x) !! y) : visited) winCell
+	    | y + 1 < (length (lvl !! 0)) 
+            && verifEastConnection (x,y) lvl visited
+		    = checkWin level ((lvl !! x) !! (y + 1)) ((lvl !! x) !! y : visited) winCell
+	    | x + 1 < (length lvl) 
+            && verifSouthConnection (x,y) lvl visited
+		    = checkWin level (lvl !! (x + 1) !! y) ((lvl !! x) !! y : visited) winCell
+	    | x - 1 >= 0 
+            && verifNorthConnection (x,y) lvl visited
+		    = checkWin level (lvl !! (x - 1) !! y) ((lvl !! x) !! y : visited) winCell
+        | otherwise = False
+            where
+                (x,y) = getPos cell
+                lvl = (getList level)
 
 wonLevel :: Level -> Bool
-wonLevel level = True
+wonLevel level = (checkWin level startCell [startCell] winCell)
     where 
         list = getList level -- [[Cell]]
         charList =  [y | x <- list, y <- x] -- [Cell]
-        startingCell = getStartCell charList -- starting point level-ului care vine
+        startCell = getStartCell charList -- starting point level-ului care vine
         winCell = getWinCell charList -- ending point level-ului
         -- recursiv sus/jos/stanga/dreapta in caz de oob 
         -- o pozitie ai sa nu te intorci

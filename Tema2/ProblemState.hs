@@ -29,11 +29,8 @@ class ProblemState s a | s -> a where
 
     isGoal :: s -> Bool
     {-
-        Primește un tuplu (a1, s1) pentru a reveni
-        la starea precedentă stării s1, adică s0,
-        prin inversarea acțiunii a1 cu a0.
-        Valoarea de retur este (a0,s0)
-        Exemplu: ((South, (1, 0)),s1) -> ((North, (2, 0)),s0)
+        Întoarce acțiunea inversă.
+        Exemplu: (South, (1, 0)) -> (North, (2, 0))
     -}
 
     reverseAction :: (a, s) -> (a, s)
