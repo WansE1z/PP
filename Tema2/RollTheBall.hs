@@ -12,8 +12,8 @@ data Directions = North | South | West | East
 type Position = (Int, Int)
 
 data Cell = CellCon {
-	getCh::Char,
-	getPos::Position
+    getPos::Position,
+	getCh::Char
 } deriving (Eq, Ord, Show)
  
 data Level = Level {
@@ -56,7 +56,7 @@ emptyLevel pos = Level (take (row+1) $ repeat $ take (col+1) $ repeat $ constr r
     where
         row = fst pos
         col = snd pos 
-        constr r c = CellCon emptySpace (r,c)
+        constr r c = CellCon (r,c) emptySpace
 
 {-
     functia asta verifica ca pozitia sa fie valabila (sa nu fie out of bounds)
@@ -73,7 +73,7 @@ verifGoodPos pos level
 -}
 
 replaceElement :: Int -> a -> [a] -> [a]
-replaceElement pos newVal list = take pos list ++ newVal : drop (pos+1) list
+replaceElement pos newVal list = take pos list ++ newVal : drop (pos + 1) list
 
 {-
     Daca pozitia este valabila , atunci adaugam celula noua
@@ -105,13 +105,13 @@ replaceElement pos newVal list = take pos list ++ newVal : drop (pos+1) list
 
 addCell :: (Char, Position) -> Level -> Level
 addCell (ch, pos) level
-    | verifGoodPos pos level = (Level (replaceElement (fst pos) cell matrix))
+    | verifGoodPos pos level = Level $ replaceElement (fst pos) cell matrix
     | otherwise = level
         where
             matrix = getMatrix level
-            (fstPart, sndPart) = splitAt (snd pos) $ matrix !! (fst pos)
-            firstPart = concat [fstPart , [CellCon ch ((fst pos),(snd pos))]]
-            secondPart = (tail sndPart)
+            (fstPart, sndPart) = splitAt (snd pos) $ matrix !! fst pos
+            firstPart = concat [fstPart , [CellCon (fst pos,snd pos) ch]]
+            secondPart = tail sndPart
             cell = concat [firstPart , secondPart]
  
 {-
@@ -156,7 +156,7 @@ verW dir
 
 verifChar :: [[Cell]] -> Position -> Bool 
 verifChar lvl (r,c)
-    | emptySpace == getCh(lvl !! r !! c) = True 
+    | emptySpace == getCh (lvl !! r !! c) = True 
     | otherwise = False
 
 {-
@@ -175,7 +175,7 @@ swap (chPozLevel , (r,c)) level cell =
 
 moveCell :: Position -> Directions -> Level -> Level
 moveCell pos dir lvl
-    | (elem chPos winningCells) || (elem chPos startCells) = lvl
+    | elem chPos startCells || elem chPos winningCells = lvl
     | verN dir && verifChar level (row - 1, col)          = swap (getCh levelPoz, (row - 1, col)) lvl cell
     | verS dir && verifChar level (row + 1, col)          = swap (getCh levelPoz, (row + 1, col)) lvl cell
     | verE dir col size && verifChar level (row, col + 1) = swap (getCh levelPoz, (row, col + 1)) lvl cell
@@ -186,8 +186,8 @@ moveCell pos dir lvl
         col = snd pos
         level = getMatrix lvl
         levelPoz = level !! row !! col
-        chPos = getCh(level !! row !! col)
-        size = length (level !! 0)
+        chPos = getCh levelPoz
+        size = length $ level !! 0
         cell = (emptySpace, (row,col))
 
 {-
@@ -197,102 +197,80 @@ moveCell pos dir lvl
 connection :: Cell -> Cell -> Directions -> Bool
 connection c1 c2 dir
     ----------------------------------- topLeft ------------------------------
-    | getCh c1 == topLeft && getCh c2 == horPipe && dir   == East  ||
-      getCh c1 == topLeft && getCh c2 == verPipe && dir   == South ||
-      getCh c1 == topLeft && getCh c2 == botLeft && dir   == South ||
-      getCh c1 == topLeft && getCh c2 == botRight && dir  == East  ||
-      getCh c1 == topLeft && getCh c2 == topRight && dir  == East  ||
-      getCh c1 == topLeft && getCh c2 == startUp && dir   == South ||
-      getCh c1 == topLeft && getCh c2 == startLeft && dir == East  ||
-      getCh c1 == topLeft && getCh c2 == winUp && dir     == South ||
-      getCh c1 == topLeft && getCh c2 == winLeft && dir   == East = True
+    | ch_cell1 == topLeft && ch_cell2 == horPipe && dir   == East  ||
+      ch_cell1 == topLeft && ch_cell2 == verPipe && dir   == South ||
+      ch_cell1 == topLeft && ch_cell2 == botLeft && dir   == South ||
+      ch_cell1 == topLeft && ch_cell2 == botRight && dir  == East  ||
+      ch_cell1 == topLeft && ch_cell2 == topRight && dir  == East  ||
+      ch_cell1 == topLeft && ch_cell2 == winUp && dir     == South ||
+      ch_cell1 == topLeft && ch_cell2 == winLeft && dir   == East = True
     ------------------------------------ topRight -----------------------------
-    | getCh c1 == topRight && getCh c2 == horPipe && dir    == West  ||
-      getCh c1 == topRight && getCh c2 == verPipe && dir    == South ||
-      getCh c1 == topRight && getCh c2 == topLeft && dir    == West  ||
-      getCh c1 == topRight && getCh c2 == botLeft && dir    == West  ||
-      getCh c1 == topRight && getCh c2 == botRight && dir   == South ||
-      getCh c1 == topRight && getCh c2 == startUp && dir    == South ||
-      getCh c1 == topRight && getCh c2 == startRight && dir == West  ||
-      getCh c1 == topRight && getCh c2 == winUp && dir      == South ||
-      getCh c1 == topRight && getCh c2 == winRight && dir   == West  = True
+    | ch_cell1 == topRight && ch_cell2 == horPipe && dir    == West  ||
+      ch_cell1 == topRight && ch_cell2 == verPipe && dir    == South ||
+      ch_cell1 == topRight && ch_cell2 == topLeft && dir    == West  ||
+      ch_cell1 == topRight && ch_cell2 == botLeft && dir    == West  ||
+      ch_cell1 == topRight && ch_cell2 == botRight && dir   == South ||
+      ch_cell1 == topRight && ch_cell2 == winUp && dir      == South ||
+      ch_cell1 == topRight && ch_cell2 == winRight && dir   == West  = True
     ------------------------------------- botLeft ------------------------------
-    | getCh c1 == botLeft && getCh c2 == horPipe && dir    == East  ||
-      getCh c1 == botLeft && getCh c2 == verPipe && dir    == North ||
-      getCh c1 == botLeft && getCh c2 == topLeft && dir    == North ||
-      getCh c1 == botLeft && getCh c2 == topRight && dir   == East  ||
-      getCh c1 == botLeft && getCh c2 == botRight && dir   == East  ||
-      getCh c1 == botLeft && getCh c2 == startDown && dir  == North ||
-      getCh c1 == botLeft && getCh c2 == startLeft && dir  == East  ||
-      getCh c1 == botLeft && getCh c2 == winDown && dir    == North ||
-      getCh c1 == botLeft && getCh c2 == winLeft && dir    == East  = True
+    | ch_cell1 == botLeft && ch_cell2 == horPipe && dir    == East  ||
+      ch_cell1 == botLeft && ch_cell2 == verPipe && dir    == North ||
+      ch_cell1 == botLeft && ch_cell2 == topLeft && dir    == North ||
+      ch_cell1 == botLeft && ch_cell2 == topRight && dir   == East  ||
+      ch_cell1 == botLeft && ch_cell2 == botRight && dir   == East  ||
+      ch_cell1 == botLeft && ch_cell2 == winDown && dir    == North ||
+      ch_cell1 == botLeft && ch_cell2 == winLeft && dir    == East  = True
     -------------------------------------- botRight ----------------------------
-    | getCh c1 == botRight && getCh c2 == horPipe && dir    == West  ||
-      getCh c1 == botRight && getCh c2 == verPipe && dir    == North ||
-      getCh c1 == botRight && getCh c2 == topLeft && dir    == West  ||
-      getCh c1 == botRight && getCh c2 == topRight && dir   == North ||
-      getCh c1 == botRight && getCh c2 == botLeft && dir    == West  ||
-      getCh c1 == botRight && getCh c2 == startDown && dir  == North ||
-      getCh c1 == botRight && getCh c2 == startRight && dir == West  ||
-      getCh c1 == botRight && getCh c2 == winDown && dir    == North ||
-      getCh c1 == botRight && getCh c2 == winRight && dir   == West  = True
+    | ch_cell1 == botRight && ch_cell2 == horPipe && dir    == West  ||
+      ch_cell1 == botRight && ch_cell2 == verPipe && dir    == North ||
+      ch_cell1 == botRight && ch_cell2 == topLeft && dir    == West  ||
+      ch_cell1 == botRight && ch_cell2 == topRight && dir   == North ||
+      ch_cell1 == botRight && ch_cell2 == botLeft && dir    == West  ||
+      ch_cell1 == botRight && ch_cell2 == winDown && dir    == North ||
+      ch_cell1 == botRight && ch_cell2 == winRight && dir   == West  = True
     --------------------------------------- horPipe ----------------------------
-    | getCh c1 == horPipe && getCh c2 == horPipe && dir     == West ||
-      getCh c1 == horPipe && getCh c2 == horPipe && dir     == East ||
-      getCh c1 == horPipe && getCh c2 == topLeft && dir     == West ||
-      getCh c1 == horPipe && getCh c2 == topRight && dir    == East ||
-      getCh c1 == horPipe && getCh c2 == botLeft && dir     == West ||
-      getCh c1 == horPipe && getCh c2 == botRight && dir    == East ||
-      getCh c1 == horPipe && getCh c2 == startLeft && dir   == West ||
-      getCh c1 == horPipe && getCh c2 == startRight && dir  == West ||
-      getCh c1 == horPipe && getCh c2 == winRight && dir    == West ||
-      getCh c1 == horPipe && getCh c2 == winLeft && dir     == East = True
+    | ch_cell1 == horPipe && ch_cell2 == horPipe && dir     == West ||
+      ch_cell1 == horPipe && ch_cell2 == horPipe && dir     == East ||
+      ch_cell1 == horPipe && ch_cell2 == topLeft && dir     == West ||
+      ch_cell1 == horPipe && ch_cell2 == topRight && dir    == East ||
+      ch_cell1 == horPipe && ch_cell2 == botLeft && dir     == West ||
+      ch_cell1 == horPipe && ch_cell2 == botRight && dir    == East ||
+      ch_cell1 == horPipe && ch_cell2 == winRight && dir    == West ||
+      ch_cell1 == horPipe && ch_cell2 == winLeft && dir     == East = True
     --------------------------------------- verPipe ----------------------------
-    | getCh c1 == verPipe && getCh c2 == verPipe && dir     == North ||
-      getCh c1 == verPipe && getCh c2 == verPipe && dir     == South ||
-      getCh c1 == verPipe && getCh c2 == topLeft && dir     == North ||
-      getCh c1 == verPipe && getCh c2 == topRight && dir    == North ||
-      getCh c1 == verPipe && getCh c2 == botLeft && dir     == South ||
-      getCh c1 == verPipe && getCh c2 == botRight && dir    == South ||
-      getCh c1 == verPipe && getCh c2 == startUp && dir     == South ||
-      getCh c1 == verPipe && getCh c2 == startDown && dir   == North ||
-      getCh c1 == verPipe && getCh c2 == winUp && dir       == South ||
-      getCh c1 == verPipe && getCh c2 == winDown && dir     == North = True
+    | ch_cell1 == verPipe && ch_cell2 == verPipe && dir     == North ||
+      ch_cell1 == verPipe && ch_cell2 == verPipe && dir     == South ||
+      ch_cell1 == verPipe && ch_cell2 == topLeft && dir     == North ||
+      ch_cell1 == verPipe && ch_cell2 == topRight && dir    == North ||
+      ch_cell1 == verPipe && ch_cell2 == botLeft && dir     == South ||
+      ch_cell1 == verPipe && ch_cell2 == botRight && dir    == South ||
+      ch_cell1 == verPipe && ch_cell2 == winUp && dir       == South ||
+      ch_cell1 == verPipe && ch_cell2 == winDown && dir     == North = True
     --------------------------------------- startUp -----------------------------
-    | getCh c1 == startUp && getCh c2 == verPipe && dir     == North ||
-      getCh c1 == startUp && getCh c2 == topLeft && dir     == North ||
-      getCh c1 == startUp && getCh c2 == topRight && dir    == North = True
+    | ch_cell1 == startUp && ch_cell2 == verPipe && dir     == North ||
+      ch_cell1 == startUp && ch_cell2 == topLeft && dir     == North ||
+      ch_cell1 == startUp && ch_cell2 == topRight && dir    == North = True
     --------------------------------------- startDown ---------------------------
-    | getCh c1 == startDown && getCh c2 == verPipe && dir   == South ||
-      getCh c1 == startDown && getCh c2 == botLeft && dir   == South ||
-      getCh c1 == startDown && getCh c2 == botRight && dir  == South = True
+    | ch_cell1 == startDown && ch_cell2 == verPipe && dir   == South ||
+      ch_cell1 == startDown && ch_cell2 == botLeft && dir   == South ||
+      ch_cell1 == startDown && ch_cell2 == botRight && dir  == South = True
     --------------------------------------- startLeft ---------------------------
-    | getCh c1 == startLeft && getCh c2 == horPipe && dir   == West ||
-      getCh c1 == startLeft && getCh c2 == topLeft && dir   == West ||
-      getCh c1 == startLeft && getCh c2 == botLeft && dir   == West = True
+    | ch_cell1 == startLeft && ch_cell2 == horPipe && dir   == West ||
+      ch_cell1 == startLeft && ch_cell2 == topLeft && dir   == West ||
+      ch_cell1 == startLeft && ch_cell2 == botLeft && dir   == West = True
     --------------------------------------- startRight --------------------------
-    | getCh c1 == startRight && getCh c2 == horPipe && dir  == East ||
-      getCh c1 == startRight && getCh c2 == botRight && dir == East ||
-      getCh c1 == startRight && getCh c2 == topRight && dir == East = True
-    --------------------------------------- winUp -------------------------------
-    | getCh c1 == winUp && getCh c2 == verPipe && dir       == North ||
-      getCh c1 == winUp && getCh c2 == topLeft && dir       == North ||
-      getCh c1 == winUp && getCh c2 == topRight && dir      == North = True
-    --------------------------------------- winDown -----------------------------
-    | getCh c1 == winDown && getCh c2 == verPipe && dir     == South ||
-      getCh c1 == winDown && getCh c2 == botLeft && dir     == South ||
-      getCh c1 == winDown && getCh c2 == botRight && dir    == South = True
-    --------------------------------------- winLeft -----------------------------
-    | getCh c1 == winLeft && getCh c2 == horPipe && dir     == West ||
-	  getCh c1 == winLeft && getCh c2 == topLeft && dir     == West ||
-	  getCh c1 == winLeft && getCh c2 == botLeft && dir     == West = True
-    --------------------------------------- winRight ----------------------------
-    | getCh c1 == winRight && getCh c2 == horPipe && dir    == East ||
-	  getCh c1 == winRight && getCh c2 == botRight && dir   == East ||
-      getCh c1 == winRight && getCh c2 == topRight && dir   == East = True
+    | ch_cell1 == startRight && ch_cell2 == horPipe && dir  == East ||
+      ch_cell1 == startRight && ch_cell2 == botRight && dir == East ||
+      ch_cell1 == startRight && ch_cell2 == topRight && dir == East = True
     -----------------------------------------------------------------------------
-    -- If there are no connections, return false
-	| otherwise = False
+    | otherwise = False
+    where
+         ch_cell1 = getCh c1
+         ch_cell2 = getCh c2
+
+    -- Daca din conexiunile verificare, nu exista niciuna, inseamna ca trebuie returnat fals
+    
+
 
 {-
     functie de returneaza celula de start
@@ -302,22 +280,32 @@ connection c1 c2 dir
 
 getStartCell :: [Cell] -> Cell
 getStartCell matrix
-    | elem (getCh ( head matrix )) startCells = head matrix 
-    | otherwise = getStartCell (tail matrix) 
+    | elem (getCh $ head matrix) startCells = head matrix 
+    | otherwise = getStartCell $ tail matrix 
 
 getWinCell :: [Cell] -> Cell
 getWinCell matrix
-    | elem (getCh ( head matrix )) winningCells = head matrix 
-    | otherwise = getWinCell (tail matrix)  
+    | elem (getCh $ head matrix) winningCells = head matrix 
+    | otherwise = getWinCell $ tail matrix  
 
 {-
     urmatoarele verificari sunt pentru conexiunile pe fiecare directie
     de asemenea, verifica si ca pozitia respectiva sa nu mai fi fost vizitata
 -}
 
+verifConnection :: Position -> [[Cell]] -> [Cell] -> Directions -> Bool
+verifConnection pos level visited dir
+    | dir == North = verifNorthConnection pos level visited
+    | dir == South = verifSouthConnection pos level visited
+    | dir == East = verifEastConnection pos level visited
+    | dir == West = verifWestConnection pos level visited
+    | otherwise = False
+
 verifNorthConnection :: Position -> [[Cell]] -> [Cell] -> Bool
 verifNorthConnection pos level visited 
-    | (connection ((level !! row) !! col) ((level !! (row - 1)) !! col) North) && not (elem ((level !! (row - 1)) !! col) visited) = True
+    | row - 1 >= 0 
+            && connection (level !! row !! col) (level !! (row - 1) !! col) North 
+            && notElem (level !! (row - 1) !! col) visited = True
     | otherwise = False
         where
             row = fst pos
@@ -325,7 +313,9 @@ verifNorthConnection pos level visited
 
 verifSouthConnection :: Position -> [[Cell]] -> [Cell] -> Bool
 verifSouthConnection pos level visited 
-    | (connection ((level !! row) !! col) ((level !! (row + 1)) !! col) South) && not (elem ((level !! (row + 1)) !! col) visited) = True
+    | row + 1 < length level 
+            && connection (level !! row !! col) (level !! (row + 1) !! col) South 
+            && notElem (level !! (row + 1) !! col) visited = True
     | otherwise = False
         where
             row = fst pos
@@ -333,15 +323,19 @@ verifSouthConnection pos level visited
 
 verifEastConnection :: Position -> [[Cell]] -> [Cell] -> Bool
 verifEastConnection pos level visited
-    | (connection ((level !! row) !! col) ((level !! row) !! (col + 1)) East) && not (elem ((level !! row) !! (col + 1)) visited) = True
+    | col + 1 < length (level !! 0) 
+        && connection (level !! row !! col) (level !! row !! (col + 1)) East 
+        && notElem (level !! row !! (col + 1)) visited = True
     | otherwise = False
         where
-                row = fst pos
-                col = snd pos
+            row = fst pos
+            col = snd pos
 
 verifWestConnection :: Position -> [[Cell]] -> [Cell] -> Bool
-verifWestConnection pos level  visited   
-    | (connection ((level !! row) !! col) ((level !! row) !! (col - 1)) West && not (elem ((level !! row) !! (col - 1)) visited)) = True
+verifWestConnection pos level visited   
+    | col - 1 >= 0 
+        && connection (level !! row !! col) (level !! row !! (col - 1)) West 
+        && notElem (level !! row !! (col - 1)) visited = True
     | otherwise = False
         where
             row = fst pos
@@ -357,37 +351,33 @@ checkWin :: Level -> Cell -> [Cell] -> Bool
 checkWin level cell visited
         | matrix !! row !! col == winCell = True
 	    | row < 0 || col < 0  = False -- out of bounds
-        | row - 1 >= 0 
-            && verifNorthConnection (row,col) matrix visited
-		    = checkWin (moveCell (getPos cell) North level) (matrix !! (row - 1) !! col) (matrix !! row !! col : visited)
-        | row + 1 < length matrix 
-            && verifSouthConnection (row,col) matrix visited
-		    = checkWin (moveCell (getPos cell) South level) (matrix !! (row + 1) !! col) (matrix !! row !! col : visited)
-        | col + 1 < length (matrix !! 0) 
-            && verifEastConnection (row,col) matrix visited
-		    = checkWin (moveCell (getPos cell) East level) (matrix !! row !! (col + 1)) (matrix !! row !! col : visited)
-	    | col - 1 >= 0 
-            && verifWestConnection (row,col) matrix visited
-		    = checkWin (moveCell (getPos cell) West level) (matrix !! row !! (col - 1)) (matrix !! row !! col : visited)
+        | verifConnection (row,col) matrix visited North
+		    = checkWin (moveCell (getPos cell) North level) (matrix !! (row - 1) !! col) addVisit
+        | verifConnection (row,col) matrix visited South
+		    = checkWin (moveCell (getPos cell) South level) (matrix !! (row + 1) !! col) addVisit
+        | verifConnection (row,col) matrix visited East
+		    = checkWin (moveCell (getPos cell) East level) (matrix !! row !! (col + 1)) addVisit
+	    | verifConnection (row,col) matrix visited West
+		    = checkWin (moveCell (getPos cell) West level) (matrix !! row !! (col - 1)) addVisit
         | otherwise = False
             where
                 (row,col) = getPos cell
                 matrix = getMatrix level -- [[Cell]]
                 charList =  [ys | xs <- matrix, ys <- xs] -- [Cell]
                 winCell = getWinCell charList -- ending point level-ului
+                addVisit = visited ++ [matrix !! row !! col]
 
 {-
     in wonLevel apelez functia auxiliara, dandu-i ca parametrii initiali matricea, celula de start si o lista in care adaug celula respectiva(visited-ul)
 -}
 
 wonLevel :: Level -> Bool
-wonLevel level = (checkWin level startCell [startCell])
+wonLevel level = checkWin level startCell [startCell]
     where 
         matrix = getMatrix level -- [[Cell]]
         charList =  [col | row <- matrix, col <- row] -- [Cell]
         startCell = getStartCell charList -- starting point level-ului care vine
 
- 
 instance ProblemState Level (Position, Directions) where
     successors = undefined
     isGoal = undefined
