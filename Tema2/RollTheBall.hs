@@ -66,7 +66,7 @@ verifGoodPos pos level
     | (fst pos) < (length $ getMatrix level) && (fst pos) >= 0 && (snd pos) < length (getMatrix level !! 0) && (snd pos) >= 0 = True
     | otherwise = False
 
-{-
+{-e
     Pentru a adauga o celula la pozitia dorita, am facut aceasta functie de replace
     care functioneaza astfel : folosesc take sa iau elementele pana la pozitia de vreau sa modific
     dupa care dau append la valoarea noua, si adaug restul de elemente de urmau dupa elementul inlocuit
