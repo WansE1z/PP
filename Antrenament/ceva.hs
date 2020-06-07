@@ -254,6 +254,22 @@ z = g
 f :: (a -> b) -> (a,a,a) -> [b]
 -}
 
+{-
 instance Num a => Num (Maybe a) where
     Just x + Just y = Just $ x + y
     _ + _ = Nothing
+-}
+
+{-
+func x y z = x y . z
+y = t
+z = a -> b
+x = t -> b -> c
+f x y z = a -> c
+f :: (t -> b -> c) -> t -> (a -> b) -> a -> c
+-}
+
+--func x y z = (x `asTypeOf` _) . (y `asTypeOf` _) (z `asTypeOf` _)
+--func g (x, y, z) = map (g `asTypeOf` _) [(x `asTypeOf` _), (y `asTypeOf` _), (z `asTypeOf` _)]
+
+--[take 5 [x | x <- [y..] , x `mod` y == 0] | y <- [1..]] returneaza flux de numere naturale [[1,2,3,4,5], [2,4,6,8,10]]
