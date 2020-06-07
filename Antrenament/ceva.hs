@@ -238,3 +238,22 @@ instance Num Bool where
 (+) = (||)
 (*) = (&&) -- supraincarcare operatori sa functioneze pe si sau logic
 -}
+
+prefixes :: [a] -> [[a]]
+prefixes s = out where
+    out = [] : zipWith f out s
+    f prefix x = prefix ++ [x]
+
+{-
+f g (x, y, z) = map g [x, y, z]
+g = a -> b
+map :: (c -> d) -> [c] -> [d]
+x = e
+y = f
+z = g
+f :: (a -> b) -> (a,a,a) -> [b]
+-}
+
+instance Num a => Num (Maybe a) where
+    Just x + Just y = Just $ x + y
+    _ + _ = Nothing
